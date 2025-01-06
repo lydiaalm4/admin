@@ -1,0 +1,196 @@
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const users = [
+    { username: 'Alice', type: 'student', email: 'alice@example.com', profileImg: 'https://via.placeholder.com/100', active: true, Info1: '', Info2: '', Info3: '', Info4: '' },
+    { username: 'Bob', type: 'teacher', email: 'bob@example.com', profileImg: 'https://via.placeholder.com/100', active: false, Info1: '', Info2: '', Info3: '', Info4: '' },
+];
+
+const userTableBody = document.getElementById('userTableBody');
+const userFilter = document.getElementById('userFilter');
+const addUserForm = document.getElementById('addUserForm');
+const addUserModal = new bootstrap.Modal(document.getElementById('addUserModal'));
+const deleteUserModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+const userDetailModal = new bootstrap.Modal(document.getElementById('userDetailModal'));
+
+function renderUsers(filteredUsers) {
+    userTableBody.innerHTML = '';
+    filteredUsers.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><img src="${user.profileImg}" alt="${user.username}'s Profile" class="profile-img" style="width: 50px; height: 50px;"></td>
+            <td>${user.username}</td>
+            <td>${user.type}</td>
+            <td>
+                <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#userDetailModal" onclick="viewUserDetails('${user.username}')">View</button>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal" onclick="prepareDeleteUser('${user.username}')">Delete</button>
+                <button class="btn ${user.active ? 'btn-success' : 'btn-warning'}" onclick="toggleActivation('${user.username}')">${user.active ? 'Deactivate' : 'Activate'}</button>
+            </td>
+        `;
+        userTableBody.appendChild(tr);
+    });
+}
+
+function toggleActivation(username) {
+    const user = users.find(user => user.username === username);
+    user.active = !user.active;
+    renderUsers(users);
+}
+
+function viewUserDetails(username) {
+        const user = users.find(user => user.username === username);
+
+        document.getElementById('userUsername').textContent = user.username;
+        document.getElementById('userEmail').textContent = user.email;
+        document.getElementById('userProfileImg').src = user.profileImg;
+        document.getElementById('userInfo1').textContent = user.Info1 || '';
+        document.getElementById('userInfo2').textContent = user.Info2 || '';
+        document.getElementById('userInfo3').textContent = user.Info3 || '';
+        document.getElementById('userInfo4').textContent = user.Info4 || '';
+
+        const editBtn = document.getElementById('editBtn');
+        const saveBtn = document.getElementById('saveBtn');
+
+        editBtn.onclick = function() {
+            editBtn.classList.add('d-none');
+            saveBtn.classList.remove('d-none');
+
+            document.getElementById('userUsername').innerHTML = `<input type="text" class="form-control" id="editUsername" value="${user.username}">`;
+            document.getElementById('userEmail').innerHTML = `<input type="email" class="form-control" id="editEmail" value="${user.email}">`;
+            document.getElementById('userInfo1').innerHTML = `<input type="text" class="form-control" id="editAutreInfo1" value="${user.Info1 || ''}">`;
+            document.getElementById('userInfo2').innerHTML = `<input type="text" class="form-control" id="editAutreInfo2" value="${user.Info2 || ''}">`;
+            document.getElementById('userInfo3').innerHTML = `<input type="text" class="form-control" id="editAutreInfo3" value="${user.Info3 || ''}">`;
+            document.getElementById('userInfo4').innerHTML = `<input type="text" class="form-control" id="editAutreInfo4" value="${user.Info4 || ''}">`;
+        };
+
+        saveBtn.onclick = function() {
+            user.username = document.getElementById('editUsername').value;
+            user.email = document.getElementById('editEmail').value;
+            user.Info1 = document.getElementById('editAutreInfo1').value;
+            user.Info2 = document.getElementById('editAutreInfo2').value;
+            user.Info3 = document.getElementById('editAutreInfo3').value;
+            user.Info4 = document.getElementById('editAutreInfo4').value;
+
+            renderUsers(users);
+
+            userDetailModal.hide();
+
+            editBtn.classList.remove('d-none');
+            saveBtn.classList.add('d-none');
+        };
+    }
+
+    renderUsers(users);
+
+
+document.getElementById('saveBtn').addEventListener('click', function() {
+    const updatedUsername = document.getElementById('editUsername').value;
+    const updatedEmail = document.getElementById('editEmail').value;
+    const updatedInfo1 = document.getElementById('editAutreInfo1').value;
+    const updatedInfo2 = document.getElementById('editAutreInfo2').value;
+    const updatedInfo3 = document.getElementById('editAutreInfo3').value;
+    const updatedInfo4 = document.getElementById('editAutreInfo4').value;
+
+    const user = users.find(user => user.username === updatedUsername);
+    if (user) {
+        user.username = updatedUsername;
+        user.email = updatedEmail;
+        user.Info1 = updatedInfo1;
+        user.Info2 = updatedInfo2;
+        user.Info3 = updatedInfo3;
+        user.Info4 = updatedInfo4;
+    }
+
+    renderUsers(users);
+
+
+    userDetailModal.hide();
+});
+
+
+
+        function prepareDeleteUser(username) {
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            confirmDeleteBtn.onclick = function() {
+                const index = users.findIndex(user => user.username === username);
+                if (index !== -1) {
+                    users.splice(index, 1);
+                    renderUsers(users);
+                }
+
+                deleteUserModal.hide();
+            };
+        }
+
+        addUserForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const type = document.getElementById('userType').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const newUser = {
+                username,
+                type,
+                email,
+                profileImg: 'https://via.placeholder.com/100',
+            };
+
+            users.push(newUser);
+
+            renderUsers(users);
+
+            addUserForm.reset();
+
+            addUserModal.hide();
+        });
+
+        userFilter.addEventListener('change', function() {
+            const filteredUsers = users.filter(user => !userFilter.value || user.type === userFilter.value);
+            renderUsers(filteredUsers);
+        });
+
+        renderUsers(users);
+    </script>
+
+
+
+    <?php
+    try {
+        $Pdo = new PDO ('mysql:dbname=univ;hostname=localhost','root','');
+        // Database connection
+        //$Pdo = new PDO('mysql:dbname=univ;host=localhost', 'root', '');
+        $Pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+        // Get data from POST request
+        $nam = $_POST['name'];
+        $fnam = $_POST['fname'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $phone = $_POST['phone'];
+        $domaine = $_POST['domaine'];
+
+        // Determine the role
+        $role = ($_POST['role'] == 'student') ? 2 : 1;
+
+        // Prepare and execute the SQL statement
+        $stmt = $Pdo->prepare("INSERT INTO users (name, firstname, email, password, phone, domaine, type) VALUES (:nam, :fnam, :email, :password, :phone, :domaine, :role)");
+        $stmt->bindParam(':nam', $nam);
+        $stmt->bindParam(':fnam', $fnam);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':password', $password);
+        $stmt->bindParam(':phone', $phone);
+        $stmt->bindParam(':domaine', $domaine);
+        $stmt->bindParam(':role', $role);
+
+        $stmt->execute();
+    ?>
+        echo "New record created successfully";
+    <?php
+    } catch (PDOException $e) {?>
+        echo "Error: " . $e->getMessage();
+    <?php }
+
+    // Close the connection
+    $Pdo = null;
+    ?>
